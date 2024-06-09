@@ -2,6 +2,7 @@ create table message (
     id integer primary key autoincrement,
     content text not null,
     ip_user char(15) not null,
+    read integer default 0 check (read in (0,1)),
     created_at text default (datetime('now','localtime'))
 )
 
