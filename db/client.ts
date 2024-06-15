@@ -59,3 +59,16 @@ export async function addReply (idMessage: number, content: string, ipUser: stri
     return false
   }
 }
+
+export async function getReply (idMessage: number): Promise<Object | boolean> {
+  const query = 'SELECT * FROM reply WHERE id_message = ?'
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [idMessage]
+    })
+    return result.rows[0] ?? false
+  } catch (error) {
+    return false
+  }
+}
