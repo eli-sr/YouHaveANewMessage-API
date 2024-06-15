@@ -1,5 +1,6 @@
 import { createClient } from '@libsql/client'
 import dotenv from 'dotenv'
+import { Message, Reply } from '../src/types'
 
 dotenv.config()
 
@@ -21,14 +22,16 @@ export async function addMessage (content: string, ipUser: string): Promise<bool
   }
 }
 
-export async function getMessage (): Promise<Object | boolean> {
+export async function getMessage (): Promise<Message | boolean> {
   const query = 'SELECT * FROM message WHERE read = 0 ORDER BY created_at ASC LIMIT 1'
   try {
     const result = await client.execute({
       sql: query,
       args: []
     })
-    return result.rows[0] ?? false
+    if (result.rows.length === 0) return false
+    const message = result.rows[0] as unknown as Message
+    return message
   } catch (error) {
     return false
   }
@@ -60,14 +63,16 @@ export async function addReply (idMessage: number, content: string, ipUser: stri
   }
 }
 
-export async function getReply (idMessage: number): Promise<Object | boolean> {
+export async function getReply (idMessage: number): Promise<Reply | boolean> {
   const query = 'SELECT * FROM reply WHERE id_message = ?'
   try {
     const result = await client.execute({
       sql: query,
       args: [idMessage]
     })
-    return result.rows[0] ?? false
+    if (result.rows.length === 0) return false
+    const reply = result.rows[0] as unknown as Reply
+    return reply
   } catch (error) {
     return false
   }
