@@ -22,7 +22,7 @@ export async function addMessage (content: string, ipUser: string): Promise<bool
   }
 }
 
-export async function getMessage (): Promise<Message | boolean> {
+export async function getMessage (): Promise<Message | false> {
   const query = 'SELECT * FROM message WHERE read = 0 ORDER BY created_at ASC LIMIT 1'
   try {
     const result = await client.execute({
@@ -63,7 +63,7 @@ export async function addReply (idMessage: number, content: string, ipUser: stri
   }
 }
 
-export async function getReply (idMessage: number): Promise<Reply | boolean> {
+export async function getReply (idMessage: number): Promise<Reply | false> {
   const query = 'SELECT * FROM reply WHERE id_message = ?'
   try {
     const result = await client.execute({
