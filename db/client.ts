@@ -10,30 +10,41 @@ const client = createClient({
 
 export async function addMessage (content: string, ipUser: string): Promise<boolean> {
   const query = 'INSERT INTO message (content, ip_user) VALUES (?, ?)'
-  const result = await client.execute({
-    sql: query,
-    args: [content, ipUser]
-  })
-  return result.rowsAffected === 1
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [content, ipUser]
+    })
+    return result.rowsAffected === 1
+  } catch (error) {
+    return false
+  }
 }
 
 export async function getMessage (): Promise<Object | boolean> {
-  const query = 'SELECT * FROM message WHERE read = 1 ORDER BY created_at ASC LIMIT 1'
-  const result = await client.execute({
-    sql: query,
-    args: []
-  })
-  return result.rows[0] ?? false
+  const query = 'SELECT * FROM message WHERE read = 0 ORDER BY created_at ASC LIMIT 1'
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: []
+    })
+    return result.rows[0] ?? false
+  } catch (error) {
+    return false
+  }
 }
 
 export async function setMessageRead (id: number): Promise<boolean> {
   const query = 'UPDATE message SET read = 1 WHERE id = ?'
-  const result = await client.execute({
-    sql: query,
-    args: [id]
-  })
-  console.log(result)
-  return result.rowsAffected === 1
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [id]
+    })
+    return result.rowsAffected === 1
+  } catch (error) {
+    return false
+  }
 }
 
 export async function addReply (idMessage: number, content: string, ipUser: string): Promise<boolean> {
