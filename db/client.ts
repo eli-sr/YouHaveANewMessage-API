@@ -35,3 +35,16 @@ export async function setMessageRead (id: number): Promise<boolean> {
   console.log(result)
   return result.rowsAffected === 1
 }
+
+export async function addReply (idMessage: number, content: string, ipUser: string): Promise<boolean> {
+  const query = 'INSERT INTO reply (id_message, content, ip_user) VALUES (?, ?, ?)'
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [idMessage, content, ipUser]
+    })
+    return result.rowsAffected === 1
+  } catch (error) {
+    return false
+  }
+}
