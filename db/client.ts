@@ -16,3 +16,12 @@ export async function addMessage (content: string, ipUser: string): Promise<Resu
   })
   return result
 }
+
+export async function getMessage (): Promise<Object | boolean> {
+  const query = 'SELECT * FROM message WHERE read = 1 ORDER BY created_at ASC LIMIT 1'
+  const result = await client.execute({
+    sql: query,
+    args: []
+  })
+  return result.rows[0] ?? false
+}
