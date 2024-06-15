@@ -25,3 +25,13 @@ export async function getMessage (): Promise<Object | boolean> {
   })
   return result.rows[0] ?? false
 }
+
+export async function setMessageRead (id: number): Promise<boolean> {
+  const query = 'UPDATE message SET read = 1 WHERE id = ?'
+  const result = await client.execute({
+    sql: query,
+    args: [id]
+  })
+  console.log(result)
+  return result.rowsAffected === 1
+}
