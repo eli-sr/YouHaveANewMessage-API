@@ -1,4 +1,4 @@
-import { ResultSet, createClient } from '@libsql/client'
+import { createClient } from '@libsql/client'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -8,13 +8,13 @@ const client = createClient({
   authToken: process.env.DATABASE_TOKEN ?? ''
 })
 
-export async function addMessage (content: string, ipUser: string): Promise<ResultSet> {
+export async function addMessage (content: string, ipUser: string): Promise<boolean> {
   const query = 'INSERT INTO message (content, ip_user) VALUES (?, ?)'
   const result = await client.execute({
     sql: query,
     args: [content, ipUser]
   })
-  return result
+  return result.rowsAffected === 1
 }
 
 export async function getMessage (): Promise<Object | boolean> {
