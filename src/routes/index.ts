@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
 import { ApiResponse } from '../types'
-import { addMessage, getMessage, setMessageRead } from '../../db/client'
+import { addMessage, getMessage, setMessageRead } from '../db/client'
 import { getIp } from '../utils'
 
 const router = Router()

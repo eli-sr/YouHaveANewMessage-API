@@ -1,6 +1,6 @@
 import { createClient } from '@libsql/client'
 import dotenv from 'dotenv'
-import { Message, Reply } from '../src/types'
+import { Message, Reply } from '../types'
 
 dotenv.config()
 
