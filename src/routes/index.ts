@@ -1,15 +1,31 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
 import { ApiResponse } from '../types'
-import { addMessage, getMessage, setMessageRead } from '../db/client'
+import { addMessage, checkIfWaited, getMessage, getReplyAndMessageByIp, setMessageRead } from '../db/client'
 import { getIp } from '../utils'
 
 const router = Router()
 
-router.get('/message', async (_req, res) => {
+router.get('/message', async (req, res) => {
   const response: ApiResponse = {
-    sentMessage: false
+    wait: false
   }
+  const ip = getIp(req.ip)
+  if (ip === null) {
+    res.status(503).json({ error: 'No service' })
+    return
+  }
+
+  const resultReply = await getReplyAndMessageByIp(ip)
+  if (resultReply === false && !await checkIfWaited(ip)) {
+    response.wait = true
+    res.json(response)
+    return
+  }
+  if (resultReply !== false) {
+    response.reply = resultReply.reply
+  }
+  //
   const message = await getMessage()
   if (message === false) {
     res.status(404).json({ error: 'There is no message to read' })
