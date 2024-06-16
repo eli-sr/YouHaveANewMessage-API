@@ -77,3 +77,24 @@ export async function getReply (idMessage: number): Promise<Reply | false> {
     return false
   }
 }
+
+export async function getReplyAndMessageByIp (ip: string): Promise<Object | false> {
+  const query = `
+    SELECT M.id,M.content message,M.ip_user,R.content reply
+    FROM message M
+    JOIN reply R ON M.id = R.id_message
+    WHERE M.ip_user = ?
+    ORDER BY created_at ASC
+    LIMIT 1
+  `
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [ip]
+    })
+    if (result.rows.length === 0) return false
+    return result.rows[0]
+  } catch (error) {
+    return false
+  }
+}
