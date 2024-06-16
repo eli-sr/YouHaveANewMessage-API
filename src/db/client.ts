@@ -99,3 +99,27 @@ export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessa
     return false
   }
 }
+
+export async function checkIfWaited (ip: string): Promise<boolean> {
+  const query = `
+    SELECT COUNT(*) cont
+    FROM (
+      SELECT ip_user,created_at
+      FROM message
+      WHERE ip_user = ?
+      ORDER BY created_at DESC
+      LIMIT 1
+    )
+    WHERE created_at <= DATETIME('now', '-1 day')
+  `
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [ip]
+    })
+    const cont = result.rows[0].cont as number
+    return cont > 0
+  } catch (error) {
+    return false
+  }
+}
