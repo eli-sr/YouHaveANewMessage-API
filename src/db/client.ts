@@ -1,6 +1,6 @@
 import { createClient } from '@libsql/client'
 import dotenv from 'dotenv'
-import { Message, Reply } from '../types'
+import { Message, Reply, ReplyAndMessage } from '../types'
 
 dotenv.config()
 
@@ -78,7 +78,7 @@ export async function getReply (idMessage: number): Promise<Reply | false> {
   }
 }
 
-export async function getReplyAndMessageByIp (ip: string): Promise<Object | false> {
+export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessage | false> {
   const query = `
     SELECT M.id,M.content message,M.ip_user,R.content reply
     FROM message M
@@ -93,7 +93,8 @@ export async function getReplyAndMessageByIp (ip: string): Promise<Object | fals
       args: [ip]
     })
     if (result.rows.length === 0) return false
-    return result.rows[0]
+    const replyAndMessage = result.rows[0] as unknown as ReplyAndMessage
+    return replyAndMessage
   } catch (error) {
     return false
   }

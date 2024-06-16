@@ -1,7 +1,6 @@
 
 export interface ApiResponse {
-  sentMessage: boolean
-  hasReply?: boolean
+  wait: boolean
   lastMessage?: string
   reply?: string
 }
@@ -18,4 +17,11 @@ export interface Reply {
   content: string
   id_message: number
   ip_user: string
+}
+
+export interface ReplyAndMessage {
+  id: number
+  ip_user: string
+  message: string
+  reply: string
 }
