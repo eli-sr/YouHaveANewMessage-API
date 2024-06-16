@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
 import { ApiResponse } from '../types'
-import { getMessage, setMessageRead } from '../../db/client'
+import { addMessage, getMessage, setMessageRead } from '../../db/client'
+import { getIp } from '../utils'
 
 const router = Router()
 
@@ -21,6 +22,29 @@ router.get('/message', async (_req, res) => {
   }
   response.lastMessage = message.content
   res.json(response)
+})
+
+router.post('/message', async (req, res) => {
+  const { message } = req.body
+  if (typeof message !== 'string' || message.trim() === '') {
+    res.status(400).json({ error: 'Message is required' })
+    return
+  }
+  if (message.length > 140) {
+    res.status(400).json({ error: 'Message is too long' })
+    return
+  }
+  const ip = getIp(req.ip)
+  if (ip === null) {
+    res.status(503).json({ error: 'No service' })
+    return
+  }
+  const result = await addMessage(message, ip)
+  if (!result) {
+    res.status(500).json({ error: 'Internal error' })
+    return
+  }
+  res.json({ info: 'Message received' })
 })
 
 export default router
