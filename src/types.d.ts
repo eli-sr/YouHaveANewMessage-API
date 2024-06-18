@@ -1,14 +1,14 @@
 
-export interface ApiResponse {
+export interface MessageResponse {
   wait: boolean
   lastMessage?: string
-  reply?: string
 }
 
 export interface Message {
   id: number
   content: string
-  ip_user: string
+  ip_writer: string
+  ip_reader: string
   read: boolean
   created_at: Date
 }
