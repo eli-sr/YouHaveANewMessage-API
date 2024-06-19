@@ -37,12 +37,12 @@ export async function getMessage (): Promise<Message | false> {
   }
 }
 
-export async function setMessageRead (id: number): Promise<boolean> {
-  const query = 'UPDATE message SET read = 1 WHERE id = ?'
+export async function setMessageRead (id: number, ipReader: string): Promise<boolean> {
+  const query = 'UPDATE message SET read = 1, ip_reader = ? WHERE id = ?'
   try {
     const result = await client.execute({
       sql: query,
-      args: [id]
+      args: [ipReader, id]
     })
     return result.rowsAffected === 1
   } catch (error) {
