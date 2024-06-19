@@ -123,3 +123,17 @@ export async function checkIfWaited (ip: string): Promise<boolean> {
     return false
   }
 }
+
+export async function checkIfRead (ip: string): Promise<boolean> {
+  const query = 'SELECT COUNT(*) cont FROM message WHERE ip_reader = ?'
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [ip]
+    })
+    const cont = result.rows[0].cont as number
+    return cont > 0
+  } catch (error) {
+    return false
+  }
+}
