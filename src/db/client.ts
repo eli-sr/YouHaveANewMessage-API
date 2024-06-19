@@ -10,7 +10,7 @@ const client = createClient({
 })
 
 export async function addMessage (content: string, ipUser: string): Promise<boolean> {
-  const query = 'INSERT INTO message (content, ip_user) VALUES (?, ?)'
+  const query = 'INSERT INTO message (content, ip_writer) VALUES (?, ?)'
   try {
     const result = await client.execute({
       sql: query,
@@ -110,7 +110,7 @@ export async function checkIfWaited (ip: string): Promise<boolean> {
       ORDER BY created_at DESC
       LIMIT 1
     )
-    WHERE created_at <= DATETIME('now', '-1 day')
+    WHERE created_at > DATETIME('now', '-1 day')
   `
   try {
     const result = await client.execute({
@@ -118,7 +118,7 @@ export async function checkIfWaited (ip: string): Promise<boolean> {
       args: [ip]
     })
     const cont = result.rows[0].cont as number
-    return cont > 0
+    return cont === 0
   } catch (error) {
     return false
   }
