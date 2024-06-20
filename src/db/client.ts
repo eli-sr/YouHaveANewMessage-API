@@ -137,3 +137,38 @@ export async function checkIfRead (ip: string): Promise<boolean> {
     return false
   }
 }
+
+export async function getLastMessagePosted (ip: string): Promise<Message | false> {
+  const query = 'SELECT * FROM message WHERE ip_writer = ?'
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [ip]
+    })
+    if (result.rows.length === 0) return false
+    const message = result.rows[0] as unknown as Message
+    return message
+  } catch (error) {
+    return false
+  }
+}
+
+export async function getLastMessageRead (ip: string): Promise<Message | false> {
+  const query = `
+    SELECT * 
+    FROM message 
+    WHERE ip_reader = ? 
+    ORDER BY created_at DESC 
+    LIMIT 1;`
+  try {
+    const result = await client.execute({
+      sql: query,
+      args: [ip]
+    })
+    if (result.rows.length === 0) return false
+    const message = result.rows[0] as unknown as Message
+    return message
+  } catch (error) {
+    return false
+  }
+}
