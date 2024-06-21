@@ -139,7 +139,12 @@ export async function checkIfRead (ip: string): Promise<boolean> {
 }
 
 export async function getLastMessagePosted (ip: string): Promise<Message | false> {
-  const query = 'SELECT * FROM message WHERE ip_writer = ?'
+  const query = `
+    SELECT * 
+    FROM message 
+    WHERE ip_writer = ? 
+    ORDER BY created_at DESC 
+    LIMIT 1;`
   try {
     const result = await client.execute({
       sql: query,
