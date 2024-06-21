@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
 import { MessageResponse } from '../types'
-import { addMessage, checkIfRead, getLastMessagePosted, getLastMessageRead, getMessage, setMessageRead } from '../db/client'
+import { addMessage, getLastMessagePosted, getLastMessageRead, getMessage, setMessageRead } from '../db/client'
 import { getIp, isCreatedAtWithinLastDay } from '../utils'
 
 const router = Router()
@@ -16,7 +16,8 @@ router.get('/message', async (req, res) => {
     return
   }
 
-  if (!await checkIfRead(ip)) {
+  const lastMessageRead = await getLastMessageRead(ip)
+  if (lastMessageRead === false) {
     const message = await getMessage()
     if (message === false) {
       res.status(404).json({ error: 'There is no message to read' })
@@ -34,11 +35,6 @@ router.get('/message', async (req, res) => {
 
   const lastMessagePosted = await getLastMessagePosted(ip)
   if (lastMessagePosted === false) {
-    const lastMessageRead = await getLastMessageRead(ip)
-    if (lastMessageRead === false) {
-      res.status(500).json({ error: 'Error getting last message read' })
-      return
-    }
     response.lastMessage = lastMessageRead.content
     res.json(response)
     return
