@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
-import { ApiResponse } from '../types'
-import { addMessage, checkIfWaited, getMessage, getReplyAndMessageByIp, setMessageRead } from '../db/client'
-import { getIp } from '../utils'
+import { MessageResponse } from '../types'
+import { addMessage, checkIfRead, getLastMessagePosted, getLastMessageRead, getMessage, setMessageRead } from '../db/client'
+import { getIp, isCreatedAtWithinLastDay } from '../utils'
 
 const router = Router()
 
 router.get('/message', async (req, res) => {
-  const response: ApiResponse = {
+  const response: MessageResponse = {
     wait: false
   }
   const ip = getIp(req.ip)
@@ -16,22 +16,47 @@ router.get('/message', async (req, res) => {
     return
   }
 
-  const resultReply = await getReplyAndMessageByIp(ip)
-  if (resultReply === false && !await checkIfWaited(ip)) {
+  if (!await checkIfRead(ip)) {
+    const message = await getMessage()
+    if (message === false) {
+      res.status(404).json({ error: 'There is no message to read' })
+      return
+    }
+    const result = await setMessageRead(message.id, ip)
+    if (!result) {
+      res.status(500).json({ error: 'Internal error' })
+      return
+    }
+    response.lastMessage = message.content
+    res.json(response)
+    return
+  }
+
+  const lastMessagePosted = await getLastMessagePosted(ip)
+  if (lastMessagePosted === false) {
+    const lastMessageRead = await getLastMessageRead(ip)
+    if (lastMessageRead === false) {
+      res.status(500).json({ error: 'Error getting last message read' })
+      return
+    }
+    response.lastMessage = lastMessageRead.content
+    res.json(response)
+    return
+  }
+
+  if (isCreatedAtWithinLastDay(lastMessagePosted.created_at)) {
     response.wait = true
     res.json(response)
     return
   }
-  if (resultReply !== false) {
-    response.reply = resultReply.reply
-  }
-  //
+
   const message = await getMessage()
   if (message === false) {
     res.status(404).json({ error: 'There is no message to read' })
     return
   }
-  const result = await setMessageRead(message.id)
+
+  const result = await setMessageRead(message.id, ip)
   if (!result) {
     res.status(500).json({ error: 'Internal error' })
     return
