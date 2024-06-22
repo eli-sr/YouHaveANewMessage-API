@@ -23,14 +23,14 @@ export async function addMessage (content: string, ipUser: string): Promise<bool
   }
 }
 
-export async function getMessage (): Promise<Message | false> {
+export async function getMessage (): Promise<Message | null> {
   const query = 'SELECT * FROM message WHERE read = 0 ORDER BY created_at ASC LIMIT 1'
   try {
     const result = await client.execute({
       sql: query,
       args: []
     })
-    if (result.rows.length === 0) return false
+    if (result.rows.length === 0) return null
     const message = result.rows[0] as unknown as Message
     return message
   } catch (error) {
@@ -64,7 +64,7 @@ export async function addReply (idMessage: number, content: string, ipUser: stri
   }
 }
 
-export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessage | false> {
+export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessage | null> {
   const query = `
     SELECT M.id,M.content message,M.ip_user,R.content reply
     FROM message M
@@ -78,7 +78,7 @@ export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessa
       sql: query,
       args: [ip]
     })
-    if (result.rows.length === 0) return false
+    if (result.rows.length === 0) return null
     const replyAndMessage = result.rows[0] as unknown as ReplyAndMessage
     return replyAndMessage
   } catch (error) {
@@ -86,7 +86,7 @@ export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessa
   }
 }
 
-export async function getLastMessagePosted (ip: string): Promise<Message | false> {
+export async function getLastMessagePosted (ip: string): Promise<Message | null> {
   const query = `
     SELECT * 
     FROM message 
@@ -98,7 +98,7 @@ export async function getLastMessagePosted (ip: string): Promise<Message | false
       sql: query,
       args: [ip]
     })
-    if (result.rows.length === 0) return false
+    if (result.rows.length === 0) return null
     const message = result.rows[0] as unknown as Message
     return message
   } catch (error) {
@@ -106,7 +106,7 @@ export async function getLastMessagePosted (ip: string): Promise<Message | false
   }
 }
 
-export async function getLastMessageRead (ip: string): Promise<Message | false> {
+export async function getLastMessageRead (ip: string): Promise<Message | null> {
   const query = `
     SELECT * 
     FROM message 
@@ -118,7 +118,7 @@ export async function getLastMessageRead (ip: string): Promise<Message | false> 
       sql: query,
       args: [ip]
     })
-    if (result.rows.length === 0) return false
+    if (result.rows.length === 0) return null
     const message = result.rows[0] as unknown as Message
     return message
   } catch (error) {

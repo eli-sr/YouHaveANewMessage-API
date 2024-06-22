@@ -17,9 +17,9 @@ router.get('/message', async (req, res) => {
   }
 
   const lastMessageRead = await getLastMessageRead(ip)
-  if (lastMessageRead === false) {
+  if (lastMessageRead === null) {
     const message = await getMessage()
-    if (message === false) {
+    if (message === null) {
       res.status(404).json({ error: 'There is no message to read' })
       return
     }
@@ -34,7 +34,7 @@ router.get('/message', async (req, res) => {
   }
 
   const lastMessagePosted = await getLastMessagePosted(ip)
-  if (lastMessagePosted === false) {
+  if (lastMessagePosted === null) {
     response.lastMessage = lastMessageRead.content
     res.json(response)
     return
@@ -47,7 +47,7 @@ router.get('/message', async (req, res) => {
   }
 
   const message = await getMessage()
-  if (message === false) {
+  if (message === null) {
     res.status(404).json({ error: 'There is no message to read' })
     return
   }
