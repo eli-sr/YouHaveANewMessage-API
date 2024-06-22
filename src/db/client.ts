@@ -1,7 +1,7 @@
 import { createClient } from '@libsql/client'
 import dotenv from 'dotenv'
 import { Message, ReplyAndMessage } from '../types'
-import ErrorAPI from '../../classes/ErrorAPI'
+import ErrorAPI from '../classes/ErrorAPI'
 
 dotenv.config()
 

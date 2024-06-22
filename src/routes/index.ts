@@ -3,7 +3,7 @@ import { Router } from 'express'
 import { MessageResponse } from '../types'
 import { addMessage, getLastMessagePosted, getLastMessageRead, getMessage, setMessageRead } from '../db/client'
 import { getIp, isCreatedAtWithinLastDay } from '../utils'
-import ErrorAPI from '../../classes/ErrorAPI'
+import ErrorAPI from '../classes/ErrorAPI'
 
 const router = Router()
 
