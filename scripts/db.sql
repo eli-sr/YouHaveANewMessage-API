@@ -4,6 +4,7 @@ create table message (
     ip_writer char(45) not null,
     ip_reader char(45) default null,
     read integer not null default 0 check (read in (0,1)),
+    read_at text default null,
     created_at text not null default (datetime('now','localtime'))
 );
 

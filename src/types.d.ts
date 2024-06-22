@@ -10,7 +10,8 @@ export interface Message {
   ip_writer: string
   ip_reader: string
   read: boolean
-  created_at: Date
+  read_at: string
+  created_at: string
 }
 
 export interface Reply {

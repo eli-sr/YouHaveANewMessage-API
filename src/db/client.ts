@@ -39,7 +39,7 @@ export async function getMessage (): Promise<Message | null> {
 }
 
 export async function setMessageRead (id: number, ipReader: string): Promise<boolean> {
-  const query = 'UPDATE message SET read = 1, ip_reader = ? WHERE id = ?'
+  const query = 'UPDATE message SET read = 1, ip_reader = ?, read_at = datetime(\'now\',\'localtime\') WHERE id = ?'
   try {
     const result = await client.execute({
       sql: query,
@@ -86,17 +86,18 @@ export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessa
   }
 }
 
-export async function getLastMessagePosted (ip: string): Promise<Message | null> {
+export async function getLastMessagePostedSinceDate (ip: string, date: string): Promise<Message | null> {
+  console.log({ ip, date })
   const query = `
     SELECT * 
     FROM message 
-    WHERE ip_writer = ? 
+    WHERE ip_writer = ? AND created_at > ?
     ORDER BY created_at DESC 
     LIMIT 1;`
   try {
     const result = await client.execute({
       sql: query,
-      args: [ip]
+      args: [ip, date]
     })
     if (result.rows.length === 0) return null
     const message = result.rows[0] as unknown as Message

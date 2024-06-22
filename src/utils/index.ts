@@ -7,7 +7,7 @@ export function getIp (reqIp: string | undefined): string | null {
   return reqIp
 }
 
-export function isCreatedAtWithinLastDay (createdAt: Date): boolean {
+export function isCreatedAtWithinLastDay (createdAt: string): boolean {
   const createdAtDate = new Date(createdAt)
   const now = new Date()
   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
