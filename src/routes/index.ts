@@ -1,66 +1,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
-import { MessageResponse } from '../types'
-import { addMessage, getLastMessagePosted, getLastMessageRead, getMessage, setMessageRead } from '../db/client'
-import { getIp, isCreatedAtWithinLastDay } from '../utils'
-import ErrorAPI from '../classes/ErrorAPI'
+import { addMessage } from '../db/client'
+import { getIp } from '../utils'
+import getMessageController from '../controllers/getMessageController'
 
 const router = Router()
 
-router.get('/message', async (req, res) => {
-  try {
-    const response: MessageResponse = {
-      wait: false
-    }
-    const ip = getIp(req.ip)
-    if (ip === null) {
-      throw new ErrorAPI('No service', 503)
-    }
-
-    const message = await getMessage()
-
-    const lastMessageRead = await getLastMessageRead(ip)
-    if (lastMessageRead === null) {
-      if (message === null) {
-        throw new ErrorAPI('There is no message to read', 404)
-      }
-      if (!await setMessageRead(message.id, ip)) {
-        throw new ErrorAPI('Internal error')
-      }
-      response.lastMessage = message.content
-      res.json(response)
-      return
-    }
-
-    const lastMessagePosted = await getLastMessagePosted(ip)
-    if (lastMessagePosted === null) {
-      response.lastMessage = lastMessageRead.content
-      res.json(response)
-      return
-    }
-    if (isCreatedAtWithinLastDay(lastMessagePosted.created_at)) {
-      response.wait = true
-      res.json(response)
-      return
-    }
-
-    if (message === null) {
-      throw new ErrorAPI('There is no message to read', 404)
-    }
-    if (!await setMessageRead(message.id, ip)) {
-      throw new ErrorAPI('Internal error')
-    }
-
-    response.lastMessage = message.content
-    res.json(response)
-  } catch (error) {
-    if (error instanceof ErrorAPI) {
-      res.status(error.statusCode).json({ error: error.message })
-      return
-    }
-    res.status(500).json({ error: 'Internal error' })
-  }
-})
+router.get('/message', getMessageController)
 
 router.post('/message', async (req, res) => {
   const { message } = req.body
