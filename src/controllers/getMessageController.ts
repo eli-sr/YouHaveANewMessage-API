@@ -30,7 +30,6 @@ export default async function getMessageController (req: Request, res: Response)
     }
 
     const lastMessagePosted = await getLastMessagePostedSinceDate(ip, lastMessageRead.read_at)
-    console.log(lastMessagePosted)
     if (lastMessagePosted === null) {
       response.lastMessage = lastMessageRead.content
       res.json(response)

@@ -87,7 +87,6 @@ export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessa
 }
 
 export async function getLastMessagePostedSinceDate (ip: string, date: string): Promise<Message | null> {
-  console.log({ ip, date })
   const query = `
     SELECT * 
     FROM message 
