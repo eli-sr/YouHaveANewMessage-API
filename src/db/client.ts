@@ -1,6 +1,6 @@
 import { createClient } from '@libsql/client'
 import dotenv from 'dotenv'
-import { Message, Reply, ReplyAndMessage } from '../types'
+import { Message, ReplyAndMessage } from '../types'
 
 dotenv.config()
 
@@ -63,21 +63,6 @@ export async function addReply (idMessage: number, content: string, ipUser: stri
   }
 }
 
-export async function getReply (idMessage: number): Promise<Reply | false> {
-  const query = 'SELECT * FROM reply WHERE id_message = ?'
-  try {
-    const result = await client.execute({
-      sql: query,
-      args: [idMessage]
-    })
-    if (result.rows.length === 0) return false
-    const reply = result.rows[0] as unknown as Reply
-    return reply
-  } catch (error) {
-    return false
-  }
-}
-
 export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessage | false> {
   const query = `
     SELECT M.id,M.content message,M.ip_user,R.content reply
@@ -95,30 +80,6 @@ export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessa
     if (result.rows.length === 0) return false
     const replyAndMessage = result.rows[0] as unknown as ReplyAndMessage
     return replyAndMessage
-  } catch (error) {
-    return false
-  }
-}
-
-export async function checkIfWaited (ip: string): Promise<boolean> {
-  const query = `
-    SELECT COUNT(*) cont
-    FROM (
-      SELECT ip_user,created_at
-      FROM message
-      WHERE ip_user = ?
-      ORDER BY created_at DESC
-      LIMIT 1
-    )
-    WHERE created_at > DATETIME('now', '-1 day')
-  `
-  try {
-    const result = await client.execute({
-      sql: query,
-      args: [ip]
-    })
-    const cont = result.rows[0].cont as number
-    return cont === 0
   } catch (error) {
     return false
   }
