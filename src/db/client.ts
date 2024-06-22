@@ -1,6 +1,7 @@
 import { createClient } from '@libsql/client'
 import dotenv from 'dotenv'
 import { Message, ReplyAndMessage } from '../types'
+import ErrorAPI from '../../classes/ErrorAPI'
 
 dotenv.config()
 
@@ -18,7 +19,7 @@ export async function addMessage (content: string, ipUser: string): Promise<bool
     })
     return result.rowsAffected === 1
   } catch (error) {
-    return false
+    throw new ErrorAPI('Error adding message')
   }
 }
 
@@ -33,7 +34,7 @@ export async function getMessage (): Promise<Message | false> {
     const message = result.rows[0] as unknown as Message
     return message
   } catch (error) {
-    return false
+    throw new ErrorAPI('Error getting message')
   }
 }
 
@@ -46,7 +47,7 @@ export async function setMessageRead (id: number, ipReader: string): Promise<boo
     })
     return result.rowsAffected === 1
   } catch (error) {
-    return false
+    throw new ErrorAPI('Error setting message read')
   }
 }
 
@@ -59,7 +60,7 @@ export async function addReply (idMessage: number, content: string, ipUser: stri
     })
     return result.rowsAffected === 1
   } catch (error) {
-    return false
+    throw new ErrorAPI('Error adding reply')
   }
 }
 
@@ -81,7 +82,7 @@ export async function getReplyAndMessageByIp (ip: string): Promise<ReplyAndMessa
     const replyAndMessage = result.rows[0] as unknown as ReplyAndMessage
     return replyAndMessage
   } catch (error) {
-    return false
+    throw new ErrorAPI('Error getting reply and message')
   }
 }
 
@@ -101,7 +102,7 @@ export async function getLastMessagePosted (ip: string): Promise<Message | false
     const message = result.rows[0] as unknown as Message
     return message
   } catch (error) {
-    return false
+    throw new ErrorAPI('Error getting last message posted')
   }
 }
 
@@ -121,6 +122,6 @@ export async function getLastMessageRead (ip: string): Promise<Message | false> 
     const message = result.rows[0] as unknown as Message
     return message
   } catch (error) {
-    return false
+    throw new ErrorAPI('Error getting last message read')
   }
 }
