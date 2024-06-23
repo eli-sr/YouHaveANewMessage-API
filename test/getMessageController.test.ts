@@ -67,4 +67,23 @@ describe('getMessageController', () => {
     expect(statusMock).toHaveBeenCalledWith(500)
     expect(jsonMock).toHaveBeenCalledWith({ error: 'Internal error' })
   })
+
+  it('should return last message read if there is no message posted', async () => {
+    const getMessageMock = client.getMessage as jest.Mock
+    const getLastMessageReadMock = client.getLastMessageRead as jest.Mock
+    const getLastMessagePostedSinceDateMock = client.getLastMessagePostedSinceDate as jest.Mock
+    getMessageMock.mockResolvedValue({
+      id: 2,
+      content: 'message'
+    })
+    getLastMessageReadMock.mockResolvedValue({
+      id: 1,
+      content: 'last message read'
+    })
+    getLastMessagePostedSinceDateMock.mockResolvedValue(null)
+
+    await getMessageController(req as Request, res as Response)
+
+    expect(jsonMock).toHaveBeenCalledWith({ wait: false, lastMessage: 'last message read' })
+  })
 })
