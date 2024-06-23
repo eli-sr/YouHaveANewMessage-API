@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import getMessageController from '../src/controllers/getMessageController'
 
-// import { getLastMessagePostedSinceDate, getLastMessageRead, getMessage, setMessageRead } from '../src/db/client'
+import * as client from '../src/db/client'
 
 jest.mock('../src/db/client', () => ({
   getMessage: jest.fn(),
@@ -40,5 +40,17 @@ describe('getMessageController', () => {
 
     expect(statusMock).toHaveBeenCalledWith(503)
     expect(jsonMock).toHaveBeenCalledWith({ error: 'No service' })
+  })
+
+  it('should return 404 if there is no message to read', async () => {
+    const getMessageMock = client.getMessage as jest.Mock
+    const getLastMessageReadMock = client.getLastMessageRead as jest.Mock
+    getMessageMock.mockResolvedValue(null)
+    getLastMessageReadMock.mockResolvedValue(null)
+
+    await getMessageController(req as Request, res as Response)
+
+    expect(statusMock).toHaveBeenCalledWith(404)
+    expect(jsonMock).toHaveBeenCalledWith({ error: 'There is no message to read' })
   })
 })
