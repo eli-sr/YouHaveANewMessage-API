@@ -116,4 +116,30 @@ describe('getMessageController', () => {
 
     expect(jsonMock).toHaveBeenCalledWith({ wait: true })
   })
+
+  it('should return message if posted 1 day ago or more', async () => {
+    const getMessageMock = client.getMessage as jest.Mock
+    const getLastMessageReadMock = client.getLastMessageRead as jest.Mock
+    const getLastMessagePostedSinceDateMock = client.getLastMessagePostedSinceDate as jest.Mock
+    const isCreatedAtWithinLastDayMock = isCreatedAtWithinLastDay as jest.Mock
+    const setMessageReadMock = client.setMessageRead as jest.Mock
+    setMessageReadMock.mockResolvedValue(true)
+    getMessageMock.mockResolvedValue({
+      id: 2,
+      content: 'message'
+    })
+    getLastMessageReadMock.mockResolvedValue({
+      id: 1,
+      content: 'last message read'
+    })
+    getLastMessagePostedSinceDateMock.mockResolvedValue({
+      id: 3,
+      content: 'last message posted'
+    })
+    isCreatedAtWithinLastDayMock.mockReturnValue(false)
+
+    await getMessageController(req as Request, res as Response)
+
+    expect(jsonMock).toHaveBeenCalledWith({ wait: false, lastMessage: 'message' })
+  })
 })
