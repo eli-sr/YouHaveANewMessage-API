@@ -53,4 +53,18 @@ describe('getMessageController', () => {
     expect(statusMock).toHaveBeenCalledWith(404)
     expect(jsonMock).toHaveBeenCalledWith({ error: 'There is no message to read' })
   })
+
+  it('should return 500 if setMessageRead fails', async () => {
+    const getMessageMock = client.getMessage as jest.Mock
+    const getLastMessageReadMock = client.getLastMessageRead as jest.Mock
+    const setMessageReadMock = client.setMessageRead as jest.Mock
+    getMessageMock.mockResolvedValue({ id: 1, content: 'message' })
+    getLastMessageReadMock.mockResolvedValue(null)
+    setMessageReadMock.mockResolvedValue(false)
+
+    await getMessageController(req as Request, res as Response)
+
+    expect(statusMock).toHaveBeenCalledWith(500)
+    expect(jsonMock).toHaveBeenCalledWith({ error: 'Internal error' })
+  })
 })
