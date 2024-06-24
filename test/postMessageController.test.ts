@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import postMessageController from '../src/controllers/postMessageController'
 
 import { addMessage, getLastMessagePostedSinceDate, getLastMessageRead } from '../src/db/client'
+import { isCreatedAtWithinLastDay } from '../src/utils'
 
 jest.mock('../src/db/client', () => ({
   addMessage: jest.fn(),
@@ -112,5 +113,21 @@ describe('postMessageController', () => {
     await postMessageController(req as Request, res as Response)
 
     expect(jsonMock).toHaveBeenCalledWith({ error: 'You must read a message before posting' })
+  })
+
+  it('should return 403 if posted message within last 24 hours', async () => {
+    const addMessageMock = addMessage as jest.Mock
+    const lastMessageReadMock = getLastMessageRead as jest.Mock
+    const lastMessagePostedSinceDateMock = getLastMessagePostedSinceDate as jest.Mock
+    const isCreatedAtWithinLastDayMock = isCreatedAtWithinLastDay as jest.Mock
+    addMessageMock.mockResolvedValue(true)
+    lastMessageReadMock.mockResolvedValue({ content: 'last message read' })
+    lastMessagePostedSinceDateMock.mockResolvedValue({ contetn: 'last message posted' })
+    isCreatedAtWithinLastDayMock.mockReturnValue(true)
+    req.body = { message: 'message' }
+
+    await postMessageController(req as Request, res as Response)
+
+    expect(jsonMock).toHaveBeenCalledWith({ error: 'You must wait 24 hours to post a new message' })
   })
 })

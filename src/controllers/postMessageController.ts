@@ -15,7 +15,6 @@ export default async function postMessageController (req: Request, res: Response
     }
     if (lastMessageRead !== null) {
       const lastMessagePosted = await getLastMessagePostedSinceDate(ip, lastMessageRead.read_at)
-      console.log({ lastMessagePosted })
       if (lastMessagePosted !== null && isCreatedAtWithinLastDay(lastMessagePosted.created_at)) {
         throw new ErrorAPI('You must wait 24 hours to post a new message', 403)
       }
