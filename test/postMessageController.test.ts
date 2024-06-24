@@ -101,4 +101,16 @@ describe('postMessageController', () => {
 
     expect(jsonMock).toHaveBeenCalledWith({ info: 'Message received' })
   })
+
+  it('should return 403 if did not read message before', async () => {
+    const addMessageMock = addMessage as jest.Mock
+    const lastMessageReadMock = getLastMessageRead as jest.Mock
+    addMessageMock.mockResolvedValue(true)
+    lastMessageReadMock.mockResolvedValue(null)
+    req.body = { message: 'message' }
+
+    await postMessageController(req as Request, res as Response)
+
+    expect(jsonMock).toHaveBeenCalledWith({ error: 'You must read a message before posting' })
+  })
 })
