@@ -1,10 +1,17 @@
 import { Request, Response } from 'express'
 import postMessageController from '../src/controllers/postMessageController'
 
-import { addMessage } from '../src/db/client'
+import { addMessage, getLastMessagePostedSinceDate, getLastMessageRead } from '../src/db/client'
 
 jest.mock('../src/db/client', () => ({
-  addMessage: jest.fn()
+  addMessage: jest.fn(),
+  getLastMessageRead: jest.fn(),
+  getLastMessagePostedSinceDate: jest.fn()
+}))
+
+jest.mock('../src/utils', () => ({
+  getIp: jest.requireActual('../src/utils').getIp,
+  isCreatedAtWithinLastDay: jest.fn()
 }))
 
 describe('postMessageController', () => {
@@ -32,6 +39,10 @@ describe('postMessageController', () => {
 
   it('should return 400 if message is not provided', async () => {
     req.body = { message: '' }
+    const lastMessageReadMock = getLastMessageRead as jest.Mock
+    const lastMessagePostedSinceDateMock = getLastMessagePostedSinceDate as jest.Mock
+    lastMessageReadMock.mockResolvedValue({ content: 'last message read' })
+    lastMessagePostedSinceDateMock.mockResolvedValue(null)
 
     await postMessageController(req as Request, res as Response)
 
@@ -40,6 +51,10 @@ describe('postMessageController', () => {
   })
 
   it('should return 400 if message is too long', async () => {
+    const lastMessageReadMock = getLastMessageRead as jest.Mock
+    const lastMessagePostedSinceDateMock = getLastMessagePostedSinceDate as jest.Mock
+    lastMessageReadMock.mockResolvedValue({ content: 'last message read' })
+    lastMessagePostedSinceDateMock.mockResolvedValue(null)
     req.body = { message: 'a'.repeat(141) }
 
     await postMessageController(req as Request, res as Response)
@@ -59,8 +74,12 @@ describe('postMessageController', () => {
   })
 
   it('should return 500 if addMessage fails', async () => {
-    (addMessage as jest.Mock).mockResolvedValue(false)
-
+    const addMessageMock = addMessage as jest.Mock
+    const lastMessageReadMock = getLastMessageRead as jest.Mock
+    const lastMessagePostedSinceDateMock = getLastMessagePostedSinceDate as jest.Mock
+    addMessageMock.mockResolvedValue(false)
+    lastMessageReadMock.mockResolvedValue({ content: 'last message read' })
+    lastMessagePostedSinceDateMock.mockResolvedValue(null)
     req.body = { message: 'message' }
 
     await postMessageController(req as Request, res as Response)
@@ -70,8 +89,12 @@ describe('postMessageController', () => {
   })
 
   it('should return 200 if message is received', async () => {
-    (addMessage as jest.Mock).mockResolvedValue(true)
-
+    const addMessageMock = addMessage as jest.Mock
+    const lastMessageReadMock = getLastMessageRead as jest.Mock
+    const lastMessagePostedSinceDateMock = getLastMessagePostedSinceDate as jest.Mock
+    addMessageMock.mockResolvedValue(true)
+    lastMessageReadMock.mockResolvedValue({ content: 'last message read' })
+    lastMessagePostedSinceDateMock.mockResolvedValue(null)
     req.body = { message: 'message' }
 
     await postMessageController(req as Request, res as Response)
