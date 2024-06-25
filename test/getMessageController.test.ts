@@ -3,6 +3,7 @@ import getMessageController from '../src/controllers/getMessageController'
 
 import * as client from '../src/db/client'
 import { isCreatedAtWithinLastDay } from '../src/utils'
+import ErrorAPI from '../src/classes/ErrorAPI'
 
 jest.mock('../src/db/client', () => ({
   getMessage: jest.fn(),
@@ -66,12 +67,14 @@ describe('getMessageController', () => {
     const setMessageReadMock = client.setMessageRead as jest.Mock
     getMessageMock.mockResolvedValue({ id: 1, content: 'message' })
     getLastMessageReadMock.mockResolvedValue(null)
-    setMessageReadMock.mockResolvedValue(false)
+    setMessageReadMock.mockImplementation(() => {
+      throw new ErrorAPI('Internal Server Error')
+    })
 
     await getMessageController(req as Request, res as Response)
 
     expect(statusMock).toHaveBeenCalledWith(500)
-    expect(jsonMock).toHaveBeenCalledWith({ error: 'Internal error' })
+    expect(jsonMock).toHaveBeenCalledWith({ error: 'Internal Server Error' })
   })
 
   it('should return last message read if there is no message posted', async () => {

@@ -21,9 +21,7 @@ export default async function getMessageController (req: Request, res: Response)
       if (message === null) {
         throw new ErrorAPI('There is no message to read', 404)
       }
-      if (!await setMessageRead(message.id, ip)) {
-        throw new ErrorAPI('Internal error')
-      }
+      await setMessageRead(message.id, ip)
       response.lastMessage = message.content
       res.json(response)
       return
@@ -44,10 +42,7 @@ export default async function getMessageController (req: Request, res: Response)
     if (message === null) {
       throw new ErrorAPI('There is no message to read', 404)
     }
-    if (!await setMessageRead(message.id, ip)) {
-      throw new ErrorAPI('Internal error')
-    }
-
+    await setMessageRead(message.id, ip)
     response.lastMessage = message.content
     res.json(response)
   } catch (error) {

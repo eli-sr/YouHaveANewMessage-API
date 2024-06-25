@@ -38,16 +38,17 @@ export async function getMessage (): Promise<Message | null> {
   }
 }
 
-export async function setMessageRead (id: number, ipReader: string): Promise<boolean> {
+export async function setMessageRead (id: number, ipReader: string): Promise<void> {
   const query = 'UPDATE message SET read = 1, ip_reader = ?, read_at = datetime(\'now\',\'localtime\') WHERE id = ?'
   try {
     const result = await client.execute({
       sql: query,
       args: [ipReader, id]
     })
-    return result.rowsAffected === 1
+    if (result.rowsAffected !== 1) throw new ErrorAPI('Error setting message read')
   } catch (error) {
-    throw new ErrorAPI('Error setting message read')
+    console.log(error)
+    throw new ErrorAPI('Internal Server Error')
   }
 }
 
