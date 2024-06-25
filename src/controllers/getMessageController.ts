@@ -10,7 +10,7 @@ export default async function getMessageController (req: Request, res: Response)
       wait: false
     }
     if (req.ip === undefined) {
-      throw new ErrorAPI('No service', 503)
+      throw new ErrorAPI('Client disconnected', 400)
     }
     const ip = getIp(req.ip)
 

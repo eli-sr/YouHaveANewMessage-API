@@ -40,13 +40,13 @@ describe('getMessageController', () => {
     }
   })
 
-  it('should return 503 if IP is undefined', async () => {
+  it('should return 400 if client disconnects', async () => {
     req.ip = undefined
 
     await getMessageController(req as Request, res as Response)
 
-    expect(statusMock).toHaveBeenCalledWith(503)
-    expect(jsonMock).toHaveBeenCalledWith({ error: 'No service' })
+    expect(statusMock).toHaveBeenCalledWith(400)
+    expect(jsonMock).toHaveBeenCalledWith({ error: 'Client disconnected' })
   })
 
   it('should return 404 if there is no message to read', async () => {
