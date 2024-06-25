@@ -1,6 +1,5 @@
 
-export function getIp (reqIp: string | undefined): string | null {
-  if (reqIp === undefined) { return null }
+export function getIp (reqIp: string): string {
   if (reqIp.startsWith('::ffff:')) {
     return reqIp.slice(7)
   }

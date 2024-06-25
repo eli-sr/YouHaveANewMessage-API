@@ -5,10 +5,10 @@ import ErrorAPI from '../classes/ErrorAPI'
 
 export default async function postMessageController (req: Request, res: Response): Promise<void> {
   try {
-    const ip = getIp(req.ip)
-    if (ip === null) {
+    if (req.ip === undefined) {
       throw new ErrorAPI('No service', 503)
     }
+    const ip = getIp(req.ip)
     const lastMessageRead = await getLastMessageRead(ip)
     if (lastMessageRead === null) {
       throw new ErrorAPI('You must read a message before posting', 403)

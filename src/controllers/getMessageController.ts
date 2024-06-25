@@ -9,10 +9,10 @@ export default async function getMessageController (req: Request, res: Response)
     const response: MessageResponse = {
       wait: false
     }
-    const ip = getIp(req.ip)
-    if (ip === null) {
+    if (req.ip === undefined) {
       throw new ErrorAPI('No service', 503)
     }
+    const ip = getIp(req.ip)
 
     const message = await getMessage()
 
